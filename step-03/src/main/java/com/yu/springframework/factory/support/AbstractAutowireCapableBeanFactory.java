@@ -21,6 +21,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         } catch (Exception e) {
             throw new BeansException("Instantiation of bean failed", e);
         }
+        registerSingleton(beanName,beanDefinition);
         return bean;
     }
 

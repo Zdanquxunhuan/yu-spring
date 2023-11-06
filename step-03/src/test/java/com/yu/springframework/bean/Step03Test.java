@@ -15,7 +15,7 @@ public class Step03Test {
         BeanDefinition beanDefinition = new BeanDefinition(Uservice.class);
         beanFactory.registerBeanDefinition("userService", beanDefinition);
 
-        Uservice uservice = (Uservice) beanFactory.getBean("userService", "yuge666");
+        Uservice uservice = (Uservice) beanFactory.getBean("userService", "yuge666",23);
         uservice.queryUserInfo();
     }
 }

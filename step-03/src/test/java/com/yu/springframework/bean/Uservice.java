@@ -9,8 +9,9 @@ import lombok.ToString;
 @ToString
 public class Uservice {
     private String name;
+    private Integer age;
 
     public void queryUserInfo() {
-        System.out.println("查询用户信息：" + name);
+        System.out.println("查询用户信息：" + name + "，年龄：" + age);
     }
 }

@@ -11,10 +11,11 @@ import com.yu.springframework.beans.BeansException;
  * @author zhongcanyu
  * @date 2023/11/8
  */
-public interface ConfigurableApplicationContext extends ApplicationContext{
+public interface ConfigurableApplicationContext extends ApplicationContext {
 
     /**
      * refresh container
+     *
      * @throws BeansException
      */
     void refresh() throws BeansException;

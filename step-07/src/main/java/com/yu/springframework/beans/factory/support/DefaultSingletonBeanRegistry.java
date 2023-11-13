@@ -23,7 +23,7 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
         stringObjectMap.put(beanName, sinletonObject);
     }
 
-    public void registerDesposableBean(String beanName, DisposableBean disposableBean) {
+    public void registerDisposableBean(String beanName, DisposableBean disposableBean) {
         disposableBeanMap.put(beanName, disposableBean);
     }
 

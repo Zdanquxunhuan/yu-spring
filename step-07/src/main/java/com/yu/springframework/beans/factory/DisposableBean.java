@@ -11,5 +11,5 @@ package com.yu.springframework.beans.factory;
  */
 public interface DisposableBean {
 
-    void destory() throws Exception;
+    void destroy() throws Exception;
 }

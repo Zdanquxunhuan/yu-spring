@@ -1,6 +1,8 @@
 package com.yu.springframework.context.support;
 
 import com.yu.springframework.beans.BeansException;
+import com.yu.springframework.beans.factory.ConfigurableListableBeanFactory;
+import com.yu.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 /**
  * Base class for {@link com.yu.springframework.context.ApplicationContext}
@@ -14,8 +16,23 @@ import com.yu.springframework.beans.BeansException;
  */
 public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext{
 
+    private DefaultListableBeanFactory beanFactory;
+
     @Override
     protected void refreshBeanFactory() throws BeansException {
+        DefaultListableBeanFactory beanFactory=createBeanFactory();
+        loadBeanDefinitions(beanFactory);
+        this.beanFactory=beanFactory;
+    }
 
+    protected abstract void loadBeanDefinitions(DefaultListableBeanFactory beanFactory);
+
+    private DefaultListableBeanFactory createBeanFactory() {
+        return new DefaultListableBeanFactory();
+    }
+
+    @Override
+    public ConfigurableListableBeanFactory getBeanFactory() {
+        return beanFactory;
     }
 }

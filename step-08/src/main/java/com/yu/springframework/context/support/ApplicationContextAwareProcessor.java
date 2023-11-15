@@ -3,6 +3,7 @@ package com.yu.springframework.context.support;
 import com.yu.springframework.beans.BeansException;
 import com.yu.springframework.beans.factory.config.BeanPostProcessor;
 import com.yu.springframework.context.ApplicationContext;
+import com.yu.springframework.context.ApplicationContextAware;
 
 /**
  * @author zhongcanyu
@@ -18,7 +19,10 @@ public class ApplicationContextAwareProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        return null;
+        if (bean instanceof ApplicationContextAware){
+            ((ApplicationContextAware) bean).setApplicationContext(applicationContext);
+        }
+        return bean;
     }
 
     @Override

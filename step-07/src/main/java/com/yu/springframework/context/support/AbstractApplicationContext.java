@@ -6,14 +6,20 @@ import com.yu.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import com.yu.springframework.beans.factory.config.BeanPostProcessor;
 import com.yu.springframework.context.ApplicationContext;
 import com.yu.springframework.context.ConfigurableApplicationContext;
+import com.yu.springframework.core.io.DefaultResourceLoader;
 
 import java.util.Map;
 
 /**
+ * Abstract implementation of the {@link com.yu.springframework.context.ApplicationContext}
+ * interface. Doesn't mandate the type of storage used for configuration; simply
+ * implements common context functionality. Uses the Template Method design pattern,
+ * requiring concrete subclasses to implement abstract methods.
+ *
  * @author zhongcanyu
  * @date 2023/11/12
  */
-public abstract class AbstractApplicationContext implements ConfigurableApplicationContext {
+public abstract class AbstractApplicationContext extends DefaultResourceLoader implements ConfigurableApplicationContext {
 
     @Override
     public void refresh() throws BeansException {

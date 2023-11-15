@@ -15,7 +15,7 @@ import java.util.Map;
  * @author zhongcanyu
  * @date 2023/11/14
  */
-public interface ListableBeanFactory {
+public interface ListableBeanFactory extends BeanFactory{
 
     /**
      * 按照类型返回 Bean 实例

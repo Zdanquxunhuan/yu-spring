@@ -24,11 +24,11 @@ public class DisposableBeanAdapter implements DisposableBean {
     }
 
     @Override
-    public void destory() throws Exception {
+    public void destroy() throws Exception {
 
         // 1. Implement the interface DisposableBean
         if (bean instanceof DisposableBean) {
-            ((DisposableBean) bean).destory();
+            ((DisposableBean) bean).destroy();
         }
 
         // 2. Annotation configuration destroy-method {The judgment is to avoid secondary execution of destruction}

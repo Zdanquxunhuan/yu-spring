@@ -45,6 +45,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
         } catch (Exception e) {
             throw new BeansException("Instantiation of bean failed", e);
+//            throw new BeansException("Instantiation of bean failed");
         }
 
         // 注册实现了 DisposableBean 接口的 Bean 对象

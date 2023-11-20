@@ -1,14 +1,18 @@
 package com.yu.springframework.beans.factory.support;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.yu.springframework.beans.BeansException;
+import com.yu.springframework.beans.PropertyValue;
 import com.yu.springframework.beans.PropertyValues;
-import com.yu.springframework.beans.factory.PropertyValue;
+import com.yu.springframework.beans.factory.*;
 import com.yu.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import com.yu.springframework.beans.factory.config.BeanDefinition;
+import com.yu.springframework.beans.factory.config.BeanPostProcessor;
 import com.yu.springframework.beans.factory.config.BeanReference;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 /**
  * Abstract bean factory superclass that implements default bean creation,
@@ -37,17 +41,93 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             populatePropertyValues(beanName, bean, beanDefinition);
 
             //Performs the Bean's initialization methods and the BeanPostProcessor's pre - and post-processing methods
-            bean=initializeBean(beanName,bean,beanDefinition);
+            bean = initializeBean(beanName, bean, beanDefinition);
 
         } catch (Exception e) {
             throw new BeansException("Instantiation of bean failed", e);
         }
 
+        // 注册实现了 DisposableBean 接口的 Bean 对象
+        registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
+
+        if (beanDefinition.isSingleton()) {
+            registerSingleton(beanName, bean);
+        }
         return bean;
     }
 
+    private void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
+
+        // 非 Singleton 类型的 Bean 不执行销毁方法
+        if (!beanDefinition.isSingleton()) return;
+
+        if (bean instanceof DisposableBean || StrUtil.isNotEmpty(beanDefinition.getDestroyMethodName())) {
+            registerDisposableBean(beanName, new DisposableBeanAdapter(bean, beanName, beanDefinition));
+        }
+    }
+
     private Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
-        return null;
+
+        if (bean instanceof Aware) {
+            if (bean instanceof BeanFactoryAware) {
+                ((BeanFactoryAware) bean).setBeanFactory(this);
+            }
+            if (bean instanceof BeanClassLoaderAware) {
+                ((BeanClassLoaderAware) bean).setBeanClassLoader(getBeanClassLoader());
+            }
+            if (bean instanceof BeanNameAware) {
+                ((BeanNameAware) bean).setBeanName(beanName);
+            }
+        }
+
+        Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
+
+        try {
+            invokeInitMethods(beanName, wrappedBean, beanDefinition);
+        } catch (Exception e) {
+            throw new BeansException("Invocation of init method of bean[" + beanName + "] failed", e);
+        }
+
+        wrappedBean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+
+        return wrappedBean;
+    }
+
+    private void invokeInitMethods(String beanName, Object bean, BeanDefinition beanDefinition) throws Exception {
+
+        if (bean instanceof InitializingBean)
+            ((InitializingBean) bean).afterPropertiesSet();
+
+        String initMethodName = beanDefinition.getInitMethodName();
+        if (StrUtil.isNotEmpty(initMethodName)) {
+            Method initMethod = beanDefinition.getBeanClass().getMethod(initMethodName);
+            if (null == initMethod) {
+                throw new BeansException("Could not find an init method named '" + initMethodName + "' on bean with name '" + beanName + "'");
+            }
+            initMethod.invoke(bean);
+        }
+    }
+
+    @Override
+    public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName) throws BeansException {
+        Object result = existingBean;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            Object current = beanPostProcessor.postProcessBeforeInitialization(result, beanName);
+            if (null == current) return result;
+            result = current;
+        }
+        return result;
+    }
+
+    @Override
+    public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException {
+        Object result = existingBean;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            Object current = beanPostProcessor.postProcessAfterInitialization(result, beanName);
+            if (null == current) return result;
+            result = current;
+        }
+        return result;
     }
 
     private void populatePropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {

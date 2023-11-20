@@ -1,7 +1,5 @@
 package com.yu.springframework.beans;
 
-import com.yu.springframework.beans.factory.PropertyValue;
-
 import java.util.ArrayList;
 import java.util.List;
 

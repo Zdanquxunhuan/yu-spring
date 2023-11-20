@@ -1,4 +1,4 @@
-package com.yu.springframework.beans.factory;
+package com.yu.springframework.beans;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

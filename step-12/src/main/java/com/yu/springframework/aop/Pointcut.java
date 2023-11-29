@@ -1,0 +1,22 @@
+package com.yu.springframework.aop;
+
+/**
+ * @Author zhongcanyu
+ * @Date 2023/11/25
+ */
+public interface Pointcut {
+
+    /**
+     * Return the ClassFilter for this pointcut.
+     *
+     * @return the ClassFilter (never <code>null</code>)
+     */
+    ClassFilter getClassFilter();
+
+    /**
+     * Return the MethodMatcher for this pointcut.
+     *
+     * @return the MethodMatcher (never <code>null</code>)
+     */
+    MethodMatcher getMethodMatcher();
+}

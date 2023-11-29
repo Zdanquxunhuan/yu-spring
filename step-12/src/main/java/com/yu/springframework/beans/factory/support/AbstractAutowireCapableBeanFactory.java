@@ -6,10 +6,7 @@ import com.yu.springframework.beans.BeansException;
 import com.yu.springframework.beans.PropertyValue;
 import com.yu.springframework.beans.PropertyValues;
 import com.yu.springframework.beans.factory.*;
-import com.yu.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import com.yu.springframework.beans.factory.config.BeanDefinition;
-import com.yu.springframework.beans.factory.config.BeanPostProcessor;
-import com.yu.springframework.beans.factory.config.BeanReference;
+import com.yu.springframework.beans.factory.config.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -34,7 +31,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         Object bean = null;
 
         try {
-            //TODO resolveBeforeInstantiation 第13章代理
+            // Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+            bean = resolveBeforeInstantiation(beanName, beanDefinition);
+            if (bean != null) {
+                return bean;
+            }
 
             bean = createBeanInstance(beanDefinition, beanName, args);
 
@@ -55,6 +56,26 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             registerSingleton(beanName, bean);
         }
         return bean;
+    }
+
+    private Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
+        Object bean = applyBeanPostProcessorsBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
+        if (null != bean) {
+            bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+        }
+        return bean;
+    }
+
+    private Object applyBeanPostProcessorsBeforeInstantiation(Class<?> beanClass, String beanName) {
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                Object result = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessBeforeInstantiation(beanClass, beanName);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
     }
 
     private void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
@@ -144,10 +165,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                     value = getBean(beanReference.getBeanName());
                 }
 
-                BeanUtil.setFieldValue(bean, beanName, value);
+                BeanUtil.setFieldValue(bean, name, value);
             }
         } catch (Exception e) {
-            throw new BeansException("Error setting property values" + beanName);
+            throw new BeansException("Error setting property values " + beanName, e);
         }
     }
 

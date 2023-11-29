@@ -25,7 +25,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
     /**
      * BeanPostProcessors to apply in createBean
      */
-    private final List<BeanPostProcessor> beanPostProcessors=new ArrayList<>();
+    private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
 
     @Override
     public Object getBean(String name) throws BeansException {
@@ -51,7 +51,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
         BeanDefinition beanDefinition = getBeanDefinition(name);
         Object bean = createBean(name, beanDefinition, args);
-        return (T) getObjectForBeanInstance(sharedInstance, name);
+        return (T) getObjectForBeanInstance(bean, name);
     }
 
     protected abstract Object createBean(String name, BeanDefinition beanDefinition, Object[] args) throws BeansException;
@@ -67,7 +67,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
         Object object = getCachedObjectForFactoryBean(beanName);
 
         if (object == null) {
-            FactoryBean<?> factoryBean = (FactoryBean<?>) object;
+            FactoryBean<?> factoryBean = (FactoryBean<?>) beanInstance;
             object = getObjectFromFactoryBean(factoryBean, beanName);
         }
 
